@@ -1,0 +1,39 @@
+{
+  "name": "redbox-api",
+  "version": "1.0.0",
+  "description": "node interface to redbox 1.8+ and 2.0",
+  "main": "dist/index",
+  "types": "dist/index",
+  "scripts": {
+    "test": "mocha -r ts-node/register lib/**/*spec.ts",
+    "prepublishOnly": "npm run compile",
+    "compile": "npm run clean && tsc -p .",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "redbox",
+    "repository"
+  ],
+  "author": "Mike Lynch <Michael.Lynch@uts.edu.au> (https://github.com/spikelynch)",
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "@types/chai": "^4.1.4",
+    "@types/mocha": "^5.2.5",
+    "chai": "^4.1.2",
+    "mocha": "^5.2.0"
+  },
+  "dependencies": {
+    "@types/qs": "^6.5.1",
+    "@types/request": "^2.47.1",
+    "@types/request-promise": "^4.1.42",
+    "@types/winston": "^2.3.9",
+    "fs-extra": "^7.0.0",
+    "lodash": "^4.17.10",
+    "qs": "^6.5.2",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.2",
+    "ts-node": "^7.0.1",
+    "typescript": "^3.0.1",
+    "winston": "^3.0.0"
+  }
+}
