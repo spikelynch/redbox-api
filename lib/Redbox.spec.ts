@@ -16,7 +16,7 @@ const fs = require('fs-extra');
 const config = require('config');
 const _ = require('lodash');
 
-const SERVERS = [ 'Test2_0' ];
+const SERVERS = [ 'Test1_9' ];
 
 const PTS = {
   'Test1_9': [ 'dmpt', 'dataset', 'self-submission' ],
@@ -28,9 +28,20 @@ const DIAG = './diag';
 
 const FIXTURES = {
   'rdmp': {
+    'Test1_9': {
+      'type': 'dmpt',
+      'data': './test/rb1_rdmp.json',
+      'diag': './test/diag/Test1_9',
+      'apiuser': 'admin',
+      'user': 'user1',
+      'permissions': {
+        'view' : [ 'admin' ],
+        'edit' : [ 'admin' ]
+      }
+    },
     'Test2_0': {
       'type': 'rdmp',
-      'data': './test/rb1_rdmp.json',
+      'data': './test/rb2_rdmp.json',
       'diag': './test/diag/Test2_0',
       'apiuser': 'admin',
       'user': 'user1',
@@ -40,20 +51,10 @@ const FIXTURES = {
         'view' : [ 'admin' ],
         'edit' : [ 'admin' ]
       }
-    },
-    'Test1_9': {
-      'type': 'dmpt',
-      'data': './test/rb2_rdmp.json',
-      'diag': './test/diag/Test1_9',
-      'apiuser': 'admin',
-      'user': 'user1',
-      'permissions': {
-        'view' : [ 'admin' ],
-        'edit' : [ 'admin' ]
-      }
-    },
+    }
   },
   'image': './test/image.jpg',
+  'text': './test/ds2.txt'
 };
 
 
@@ -72,7 +73,6 @@ async function makerecord(rb:Redbox, server: string): Promise<string> {
   const ptype = FIXTURES['rdmp'][server]['type'];
   const mdj = await fs.readFile(FIXTURES['rdmp'][server]['data']);
   const oid = await rb.createRecord(mdj, ptype);
-  console.log("makerecord returned: " + oid);
   return oid;
 }
 
@@ -83,16 +83,15 @@ describe('Redbox', function() {
     this.timeout(10000);
     
   
-    it.skip('can fetch lists of objects from ' + server, async () => {
+    it('can fetch lists of objects from ' + server, async () => {
       for( var i in PTS[server] ) {
         let pt = PTS[server][i];
-        console.log("Package type " + pt);
         const oids = await rb.list(pt);
         expect(oids).to.not.be.empty;
       }
     });
     
-    it.skip('can fetch a record from ' + server, async () => {
+    it('can fetch a record from ' + server, async () => {
       const oids = await rb.list(PTS[server][0]);
       expect(oids).to.not.be.empty;
       const oid = oids[0];
@@ -102,7 +101,7 @@ describe('Redbox', function() {
       
     });
     
-    it.skip('can create a record in ' + server, async () => {
+    it('can create a record in ' + server, async () => {
       const oid = await makerecord(rb, server);
       expect(oid).to.not.be.null;
 
@@ -111,65 +110,68 @@ describe('Redbox', function() {
 
       const mdf2 = path.join(FIXTURES['rdmp'][server]['diag'], oid + '.out.json');
       await fs.writeJson(mdf2, md2);
-      console.log("Wrote retrieved JSON to " + mdf2); 
       const mdj = await fs.readFile(FIXTURES['rdmp'][server]['data']);
       const md1 = JSON.parse(mdj);
       expect(md2).to.deep.equal(md1);
     });
 
-    it.skip('can read permissions from ' + server, async () => {
+    it('can read permissions from ' + server, async () => {
       const oid = await makerecord(rb, server);
-      console.log(Object.getPrototypeOf(rb));
 
       const perms = await rb.getPermissions(oid);
       expect(perms).to.not.be.undefined;
 
       expect(perms).to.deep.equal(FIXTURES['rdmp'][server]['permissions']);
-    })
+    });
 
-    it.skip('can set view permissions in ' + server, async () => {
-      const oid = await makerecord(rb, server);
+   	if( rb.version === 'Redbox2') {	
+    	it('can set view permissions in ' + server, async () => {
+      	const oid = await makerecord(rb, server);
 
-      const perms1 = await rb.getPermissions(oid);
-      expect(perms1).to.not.be.undefined;
+      	const perms1 = await rb.getPermissions(oid);
+      	expect(perms1).to.not.be.undefined;
 
-      const resp = await rb.grantPermission(oid, 'view', {
-        'users': [ FIXTURES['rdmp'][server]['user'] ]
-      });
+      	const resp = await rb.grantPermission(oid, 'view', {
+        	'users': [ FIXTURES['rdmp'][server]['user'] ]
+      	});
 
-      var nperms = _.cloneDeep(FIXTURES['rdmp'][server]['permissions']);
-      nperms['view'].push(FIXTURES['rdmp'][server]['user']);
+      	var nperms = _.cloneDeep(FIXTURES['rdmp'][server]['permissions']);
+      	nperms['view'].push(FIXTURES['rdmp'][server]['user']);
 
-      expect(resp).to.deep.equal(nperms);
-    })
+      	expect(resp).to.deep.equal(nperms);
+    	});
+    }
 
-    it.skip('can set edit permissions in ' + server, async () => {
-      const oid = await makerecord(rb, server);
+   	if( rb.version === 'Redbox2') {	
+      it('can set edit permissions in ' + server, async () => {
+	      const oid = await makerecord(rb, server);
 
-      const perms1 = await rb.getPermissions(oid);
-      expect(perms1).to.not.be.undefined;
+  	    const perms1 = await rb.getPermissions(oid);
+    	  expect(perms1).to.not.be.undefined;
 
-      const resp = await rb.grantPermission(oid, 'edit', {
-        'users': [ FIXTURES['rdmp'][server]['user'] ]
-      });
+	      const resp = await rb.grantPermission(oid, 'edit', {
+  	      'users': [ FIXTURES['rdmp'][server]['user'] ]
+    	  });
 
-      var nperms = _.cloneDeep(FIXTURES['rdmp'][server]['permissions']);
-      nperms['edit'].push(FIXTURES['rdmp'][server]['user']);
+	      var nperms = _.cloneDeep(FIXTURES['rdmp'][server]['permissions']);
+  	    nperms['edit'].push(FIXTURES['rdmp'][server]['user']);
 
-      expect(resp).to.deep.equal(nperms);
-    })
+    	  expect(resp).to.deep.equal(nperms);
+    	});
+   	}
 
     
     it('can write and read datastreams in ' + server, async () => {
-      const oid = makerecord(rb, server);
-      expect(oid).to.not.be.empty;
-      const data = await fs.readFile(FIXTURES['image']);
-      const dsid = "attachment.jpg";
-      // console.log("About to write object datastream");
-      // const resp = await rb.writeDatastream(oid, dsid, data);
-      // console.log("Response" + JSON.stringify(resp));
-      // const data2 = await rb.readDatastream(oid, dsid);
-      // expect(data2).to.equal(data);
+      const oid = await makerecord(rb, server);
+      console.log("oid = " + oid);
+      expect(oid).to.not.be.undefined;
+      const data = await fs.readFile(FIXTURES['text']);
+      const dsid = "attachment.txt";
+      console.log("About to write object datastream");
+      const resp = await rb.writeDatastream(oid, dsid, data);
+      console.log("Response" + JSON.stringify(resp));
+      const data2 = await rb.readDatastream(oid, dsid);
+      expect(data2).to.equal(data);
     });
     
   });

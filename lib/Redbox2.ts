@@ -174,7 +174,7 @@ export class Redbox2 extends BaseRedbox implements Redbox {
     try {
       let response = await this.apipost(
         'api/records/permissions/' + permission + '/' + oid,
-        users
+        { params: users }
         );
       return response;
     } catch(e) {
@@ -208,7 +208,7 @@ export class Redbox2 extends BaseRedbox implements Redbox {
       let response = await this.apipost(
         'datastream/' + oid,
         data,
-        { datastreamId: dsid }
+        { params: { datastreamId: dsid } }
       );
       return response;
     } catch(e) {

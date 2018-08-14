@@ -196,8 +196,6 @@ export class Redbox1 extends BaseRedbox implements Redbox {
       fl: 'security_exception',
       wt: 'json'
     };
-    console.log("solr url: " + url);
-    console.log("params: " + JSON.stringify(params));
     let response = await this.solrAi.get(url, { params: params });
     if( response.status === 200 ) {
       const sresp = response.data['response'];
@@ -225,7 +223,10 @@ export class Redbox1 extends BaseRedbox implements Redbox {
       let response = await this.apipost(
         'datastream/' + oid,
         data,
-        { datastreamId: dsid }
+        {
+        	params: { datastreamId: dsid },
+        	headers: { 'Content-Type': 'application/octet-stream' }
+        }
       );
       return response;
     } catch(e) {

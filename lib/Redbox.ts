@@ -65,8 +65,6 @@ export abstract class BaseRedbox {
      URL-encodes the solr query string for search */
   
   initApiClient() {
-  	console.log("axios baseURL = " + this.baseURL);
-  	console.log("axios apiKey = " + this.apiKey);
     this.ai = axios.create({
       baseURL: this.baseURL,
       headers: {
@@ -114,17 +112,17 @@ export abstract class BaseRedbox {
   
   /* low-level method used by POST requests */
   
-  async apipost(path: string, payload: Object, params?: Object): Promise<Object|undefined> {
+  async apipost(path: string, payload: Object, options?: Object): Promise<Object|undefined> {
     let url = path;
-    let config = {};
+    let aoptions = {};
     if( url[0] !== '/' ) {
       url = '/' + url;
     }
     try {
-      if( params ) {
-        config["params"] = params;
+      if( options ) {
+        aoptions = options;
       }
-      let response = await this.ai.post(url, payload, config);
+      let response = await this.ai.post(url, payload, options);
       if( response.status >= 200 && response.status < 300 ) {
         return response.data;
       }
@@ -133,7 +131,7 @@ export abstract class BaseRedbox {
       console.log("\n\nPost error " + String(e));
       console.log("URL: " + url);
       console.log("payload: " + JSON.stringify(payload).slice(0, 40));
-      console.log("config:" + JSON.stringify(config));
+      console.log("options:" + JSON.stringify(options));
       return undefined;
     }
   }
