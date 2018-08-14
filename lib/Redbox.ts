@@ -32,6 +32,9 @@ export interface Redbox {
   getRecord(oid: string): Promise<Object|undefined>;
   getRecordMetadata(oid: string): Promise<Object|undefined>;
   updateRecordMetadata(oid: string, metadata: Object): Promise<Object|undefined>;
+  writeDatastream(oid: string, dsid: string, data: any): Promise<Object>;
+  readDatastream(oid: string, dsid: string): Promise<Object>;
+  listDatastreams(oid: string): Promise<Object>;
   getPermissions(oid: string): Promise<Object|undefined>;
   grantPermission(oid: string, permission: string, users:Object): Promise<Object|undefined>;
   removePermission(oid: string, permission: string, users:Object): Promise<Object|undefined>;
@@ -62,6 +65,8 @@ export abstract class BaseRedbox {
      URL-encodes the solr query string for search */
   
   initApiClient() {
+  	console.log("axios baseURL = " + this.baseURL);
+  	console.log("axios apiKey = " + this.apiKey);
     this.ai = axios.create({
       baseURL: this.baseURL,
       headers: {
@@ -124,7 +129,8 @@ export abstract class BaseRedbox {
         return response.data;
       }
     } catch ( e ) {
-      console.trace("\n\nPost error " + String(e));
+      console.trace();
+      console.log("\n\nPost error " + String(e));
       console.log("URL: " + url);
       console.log("payload: " + JSON.stringify(payload).slice(0, 40));
       console.log("config:" + JSON.stringify(config));

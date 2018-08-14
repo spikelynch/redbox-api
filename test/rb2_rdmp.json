@@ -1,0 +1,13 @@
+{
+    "authorization": {
+        "edit": [ "admin" ],
+        "view": [ "admin" ],
+        "editPending": [],
+        "viewPending": []
+    },
+    "workflowStage": "draft",
+    "metadata": {
+        "title": "Test RDMP created by redbox-api tests",
+        "description": "The objective of this project is to advance knowledge on the healthy functioning of the coral–algal symbiosis, which defines the response of coral reef ecosystems to worldwide environmental change. Current approaches to address this problem have linked coral health to algal symbiont diversity but have been unable to resolve the fundamental symbiont functional traits that govern this link – the “key performance indicators (KPIs)”. This project plans to couple advanced physiological and functional genomics techniques to transform our understanding of how algal symbiont metabolic KPIs regulate coral growth and stress susceptibility. This may provide new diagnostic capability for the assessment of coral health and may enable us to improve coral reef ecosystem management."
+    }
+}

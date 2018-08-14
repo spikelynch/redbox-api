@@ -16,7 +16,7 @@ const fs = require('fs-extra');
 const config = require('config');
 const _ = require('lodash');
 
-const SERVERS = [ 'Test1_9', 'Test2_0' ];
+const SERVERS = [ 'Test2_0' ];
 
 const PTS = {
   'Test1_9': [ 'dmpt', 'dataset', 'self-submission' ],
@@ -30,7 +30,7 @@ const FIXTURES = {
   'rdmp': {
     'Test2_0': {
       'type': 'rdmp',
-      'data': './test/rdmp.json',
+      'data': './test/rb1_rdmp.json',
       'diag': './test/diag/Test2_0',
       'apiuser': 'admin',
       'user': 'user1',
@@ -43,7 +43,7 @@ const FIXTURES = {
     },
     'Test1_9': {
       'type': 'dmpt',
-      'data': './test/rdmp.json',
+      'data': './test/rb2_rdmp.json',
       'diag': './test/diag/Test1_9',
       'apiuser': 'admin',
       'user': 'user1',
@@ -71,7 +71,9 @@ function rbconnect(server: string):Redbox {
 async function makerecord(rb:Redbox, server: string): Promise<string> {
   const ptype = FIXTURES['rdmp'][server]['type'];
   const mdj = await fs.readFile(FIXTURES['rdmp'][server]['data']);
-  return await rb.createRecord(mdj, ptype);
+  const oid = await rb.createRecord(mdj, ptype);
+  console.log("makerecord returned: " + oid);
+  return oid;
 }
 
 
@@ -115,7 +117,7 @@ describe('Redbox', function() {
       expect(md2).to.deep.equal(md1);
     });
 
-    it('can read permissions from ' + server, async () => {
+    it.skip('can read permissions from ' + server, async () => {
       const oid = await makerecord(rb, server);
       console.log(Object.getPrototypeOf(rb));
 
@@ -125,7 +127,7 @@ describe('Redbox', function() {
       expect(perms).to.deep.equal(FIXTURES['rdmp'][server]['permissions']);
     })
 
-    it('can set view permissions in ' + server, async () => {
+    it.skip('can set view permissions in ' + server, async () => {
       const oid = await makerecord(rb, server);
 
       const perms1 = await rb.getPermissions(oid);
@@ -141,7 +143,7 @@ describe('Redbox', function() {
       expect(resp).to.deep.equal(nperms);
     })
 
-    it('can set edit permissions in ' + server, async () => {
+    it.skip('can set edit permissions in ' + server, async () => {
       const oid = await makerecord(rb, server);
 
       const perms1 = await rb.getPermissions(oid);
@@ -158,22 +160,17 @@ describe('Redbox', function() {
     })
 
     
-    // Note: rb.writeObjectDatastream needs to set the
-    // content-type header to match the payload, I think.
-    
-    // it('can write and read datastreams in 1.9', async () => {
-    //   const rb = rbconnect('Test1_9');
-    //   const mdf = await fs.readFile(FIXTURES['dmpt']);
-    //   const oid = await rb.createObject(mdf, 'dmpt');
-    //   const data = await fs.readFile(FIXTURES['image']);
-    //   const dsid = "attachment.jpg";
-    //   console.log("About to write object datastream");
-    //   const resp = await rb.writeObjectDatastream(oid, dsid, data);
-    //   console.log("Response" + JSON.stringify(resp));
-    //   const o2 = await rb.getObject(oid);
-    //   const data2 = await rb.readObjectDatastream(oid, dsid);
-    //   expect(data2).to.equal(data);
-    // });
+    it('can write and read datastreams in ' + server, async () => {
+      const oid = makerecord(rb, server);
+      expect(oid).to.not.be.empty;
+      const data = await fs.readFile(FIXTURES['image']);
+      const dsid = "attachment.jpg";
+      // console.log("About to write object datastream");
+      // const resp = await rb.writeDatastream(oid, dsid, data);
+      // console.log("Response" + JSON.stringify(resp));
+      // const data2 = await rb.readDatastream(oid, dsid);
+      // expect(data2).to.equal(data);
+    });
     
   });
 });

@@ -79,6 +79,7 @@ export class Redbox2 extends BaseRedbox implements Redbox {
     let url = 'api/records/metadata/' + packagetype;
     let params: Object = {};
     let resp = await this.apipost(url, metadata, options);
+    console.log("Response: " + JSON.stringify(resp));
     if( resp && 'oid' in resp ) {
       return resp['oid'];
     } else {
