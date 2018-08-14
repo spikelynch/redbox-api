@@ -4,6 +4,10 @@
   "description": "node interface to redbox 1.8+ and 2.0",
   "main": "dist/index",
   "types": "dist/index",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/spikelynch/redbox-api.git"
+  },
   "scripts": {
     "test": "mocha -r ts-node/register lib/**/*spec.ts",
     "prepublishOnly": "npm run compile",
@@ -19,7 +23,9 @@
   "devDependencies": {
     "@types/chai": "^4.1.4",
     "@types/mocha": "^5.2.5",
+    "axios-debug": "0.0.4",
     "chai": "^4.1.2",
+    "config": "^2.0.1",
     "mocha": "^5.2.0"
   },
   "dependencies": {
@@ -27,6 +33,7 @@
     "@types/request": "^2.47.1",
     "@types/request-promise": "^4.1.42",
     "@types/winston": "^2.3.9",
+    "axios": "^0.18.0",
     "fs-extra": "^7.0.0",
     "lodash": "^4.17.10",
     "qs": "^6.5.2",
