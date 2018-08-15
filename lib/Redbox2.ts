@@ -204,32 +204,36 @@ export class Redbox2 extends BaseRedbox implements Redbox {
 
 
   async writeDatastream(oid: string, dsid: string, data: any): Promise<Object> {
-    try {
-      let response = await this.apipost(
-        'datastream/' + oid,
-        data,
-        { params: { datastreamId: dsid } }
-      );
-      return response;
-    } catch(e) {
-      console.log("Error " + e);
-    }
+  	console.error("writeDatastreams not available");
+  	return undefined;
+    // try {
+    //   let response = await this.apipost(
+    //     'datastream/' + oid,
+    //     data,
+    //     { params: { datastreamId: dsid } }
+    //   );
+    //   return response;
+    // } catch(e) {
+    //   console.log("Error " + e);
+    // }
   }
 
 
   async listDatastreams(oid: string): Promise<Object> {
-    try {
-      let response = await this.apiget('datastream/' +oid + '/list');
-      return response;
-    } catch(e) {
-      console.log("Error " + e);
-      return undefined;
-    }
+  	console.error("listDatastreams not available - use the record metadata");
+  	return undefined;
+    // try {
+    //   let response = await this.apiget('datastream/' +oid + '/list');
+    //   return response;
+    // } catch(e) {
+    //   console.log("Error " + e);
+    //   return undefined;
+    // }
   }
   
   async readDatastream(oid: string, dsid: string): Promise<any> {
     try {
-      let response = await this.apiget('datastream/' + oid, { datastreamId: dsid });
+      let response = await this.apiget('api/records/datastreams/' + oid, { datastreamId: dsid });
       return response;
     } catch(e) {
       console.log("Error " + e);
