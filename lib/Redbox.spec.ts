@@ -7,16 +7,26 @@ import { Redbox } from './Redbox';
 import { Redbox1 } from './Redbox1';
 import { Redbox2 } from './Redbox2';
 
+import { Readable } from 'stream';
 
 
-import { expect } from 'chai';
+const chai = require('chai');
+const chaiFiles = require('chai-files');
+
+chai.use(chaiFiles);
+
+const expect = chai.expect;
+const assert = chai.assert;
+const file = chaiFiles.file;
+
+
 const path = require('path');
 
 const fs = require('fs-extra');
 const config = require('config');
 const _ = require('lodash');
 
-const SERVERS = [ 'Test1_9' ];
+const SERVERS = [ 'Test2_0' ];
 
 const PTS = {
   'Test1_9': [ 'dmpt', 'dataset', 'self-submission' ],
@@ -24,7 +34,7 @@ const PTS = {
 };
 
 const DIAG = './diag';
-
+const OUTPUT = './test/output/';
 
 const FIXTURES = {
   'rdmp': {
@@ -77,13 +87,38 @@ async function makerecord(rb:Redbox, server: string): Promise<string> {
 }
 
 
+async function stream2file(stream: Readable, fn: string): Promise<boolean> {
+  var wstream = fs.createWriteStream(fn);
+  stream.pipe(wstream);
+  return new Promise<boolean>( (resolve, reject) => {
+    wstream.on('finish', () => { resolve(true) }); 
+    wstream.on('error', reject);
+  });
+}
+
+
+// sync function to ensure OUTPUT is present and empty
+
+function ensureEmptyDir(d) {
+	fs.ensureDirSync(d);
+	var contents = fs.readdirSync(d);
+	for( var i = 0; i < contents.length; i++ ) {
+		if( contents[i] != '.' && contents[i] != '..' ) {
+			var fn = path.join(d, contents[i]);
+			fs.removeSync(fn);
+		}
+	}
+}
+
+
 describe('Redbox', function() {
   SERVERS.forEach(server => {
     const rb = rbconnect(server);
     this.timeout(10000);
+
+    beforeEach(() => ensureEmptyDir(OUTPUT));
     
-  
-    it('can fetch lists of objects from ' + server, async () => {
+    it.skip('can fetch lists of objects from ' + server, async () => {
       for( var i in PTS[server] ) {
         let pt = PTS[server][i];
         const oids = await rb.list(pt);
@@ -91,7 +126,7 @@ describe('Redbox', function() {
       }
     });
     
-    it('can fetch a record from ' + server, async () => {
+    it.skip('can fetch a record from ' + server, async () => {
       const oids = await rb.list(PTS[server][0]);
       expect(oids).to.not.be.empty;
       const oid = oids[0];
@@ -101,7 +136,7 @@ describe('Redbox', function() {
       
     });
     
-    it('can create a record in ' + server, async () => {
+    it.skip('can create a record in ' + server, async () => {
       const oid = await makerecord(rb, server);
       expect(oid).to.not.be.null;
 
@@ -115,7 +150,7 @@ describe('Redbox', function() {
       expect(md2).to.deep.equal(md1);
     });
 
-    it('can read permissions from ' + server, async () => {
+    it.skip('can read permissions from ' + server, async () => {
       const oid = await makerecord(rb, server);
 
       const perms = await rb.getPermissions(oid);
@@ -125,7 +160,7 @@ describe('Redbox', function() {
     });
 
    	if( rb.version === 'Redbox2') {	
-    	it('can set view permissions in ' + server, async () => {
+    	it.skip('can set view permissions in ' + server, async () => {
       	const oid = await makerecord(rb, server);
 
       	const perms1 = await rb.getPermissions(oid);
@@ -143,7 +178,7 @@ describe('Redbox', function() {
     }
 
    	if( rb.version === 'Redbox2') {	
-      it('can set edit permissions in ' + server, async () => {
+      it.skip('can set edit permissions in ' + server, async () => {
 	      const oid = await makerecord(rb, server);
 
   	    const perms1 = await rb.getPermissions(oid);
@@ -167,11 +202,12 @@ describe('Redbox', function() {
       expect(oid).to.not.be.undefined;
       const data = await fs.readFile(FIXTURES['text']);
       const dsid = "attachment.txt";
-      console.log("About to write object datastream");
       const resp = await rb.writeDatastream(oid, dsid, data);
-      console.log("Response" + JSON.stringify(resp));
-      const data2 = await rb.readDatastream(oid, dsid);
-      expect(data2).to.equal(data);
+      const ds2 = await rb.readDatastream(oid, dsid);
+      const outfile = path.join(OUTPUT, 'output.txt');
+      const success = await(stream2file(ds2, outfile));
+      assert(success);
+      expect(file(outfile)).to.equal(file(FIXTURES['text']));
     });
     
   });

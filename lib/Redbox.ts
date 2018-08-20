@@ -5,6 +5,7 @@
 
 import axios from 'axios';
 import { AxiosInstance } from 'axios';
+import { Readable } from 'stream';
 const qs = require('qs');
 const util = require('util');
 
@@ -33,7 +34,7 @@ export interface Redbox {
   getRecordMetadata(oid: string): Promise<Object|undefined>;
   updateRecordMetadata(oid: string, metadata: Object): Promise<Object|undefined>;
   writeDatastream(oid: string, dsid: string, data: any): Promise<Object>;
-  readDatastream(oid: string, dsid: string): Promise<Object>;
+  readDatastream(oid: string, dsid: string): Promise<Readable>;
   listDatastreams(oid: string): Promise<Object>;
   getPermissions(oid: string): Promise<Object|undefined>;
   grantPermission(oid: string, permission: string, users:Object): Promise<Object|undefined>;
@@ -91,19 +92,22 @@ export abstract class BaseRedbox {
   
   /* low-level method which is used by all the GET requests */
   
-  async apiget(path: string, params?: Object): Promise<Object|undefined> {
+  // pass responseType: 'stream' into options to get a stream
+  // as response.data
+
+  async apiget(path: string, params?: Object, options?: Object): Promise<any> {
     let url = path;
     if( url[0] !== '/' ) {
       url = '/' + url;
     }
     try {
-      let config = {};
+      let config = options;
       if( params ) {
         config["params"] = params;
       }
       let response = await this.ai.get(url, config);
       if( response.status === 200 ) {
-        return response.data;
+       	return response.data;
       }
     } catch ( e ) {
       return undefined;

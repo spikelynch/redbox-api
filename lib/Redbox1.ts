@@ -6,6 +6,7 @@ import axios from 'axios';
 require('axios-debug')(axios);
 
 import { AxiosInstance } from 'axios';
+import { Readable } from 'stream';
 const qs = require('qs');
 const util = require('util');
 const _ = require('lodash');
@@ -244,10 +245,14 @@ export class Redbox1 extends BaseRedbox implements Redbox {
       return undefined;
     }
   }
-  
-  async readDatastream(oid: string, dsid: string): Promise<any> {
+
+  async readDatastream(oid: string, dsid: string): Promise<Readable> {
     try {
-      let response = await this.apiget('datastream/' + oid, { datastreamId: dsid });
+      let response = await this.apiget(
+      	'datastream/' + oid,
+      	{ datastreamId: dsid },
+      	{ responseType: "stream"}
+      	);
       return response;
     } catch(e) {
       console.log("Error " + e);
