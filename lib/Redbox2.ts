@@ -233,7 +233,12 @@ export class Redbox2 extends BaseRedbox implements Redbox {
   
   async readDatastream(oid: string, dsid: string): Promise<any> {
     try {
-      let response = await this.apiget('api/records/datastreams/' + oid, { datastreamId: dsid });
+      let response = await this.apiget(
+      	'api/records/datastreams/' + oid,
+      	{ datastreamId: dsid },
+      	{ responseType: "stream"}
+      	);
+      console.log("Response = " + response);
       return response;
     } catch(e) {
       console.log("Error " + e);
