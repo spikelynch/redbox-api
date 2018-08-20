@@ -238,7 +238,6 @@ export class Redbox2 extends BaseRedbox implements Redbox {
       	{ datastreamId: dsid },
       	{ responseType: "stream"}
       	);
-      console.log("Response = " + response);
       return response;
     } catch(e) {
       console.log("Error " + e);

@@ -1,6 +1,6 @@
 {
   "name": "redboxresearchdata-api",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "node interface to the ReDBox research data catalogue 1.8+ and 2.0",
   "main": "dist/index",
   "types": "dist/index",
